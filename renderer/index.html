@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>J.A.R.V.I.S. - AI Desktop Assistant</title>
+  <link rel="icon" type="image/png" href="icon.png">
+  <!-- Google Fonts: Orbitron & Pretendard -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="hud-container">
+    <!-- Top HUD Navigation / Status Bar -->
+    <header class="hud-header">
+      <div class="brand-group">
+        <div class="mini-reactor-pulse"></div>
+        <div class="brand-titles">
+          <h1 class="brand-name">J.A.R.V.I.S. <span class="version-tag">MARK 4.31B</span></h1>
+          <p class="brand-sub">STARK INDUSTRIES DESKTOP AI PROTOCOL</p>
+        </div>
+      </div>
+
+      <!-- Live Hardware Status Gauges -->
+      <div class="hardware-gauges">
+        <div class="gauge-chip" id="cpu-chip">
+          <span class="gauge-label">CPU</span>
+          <span class="gauge-val" id="cpu-val">--%</span>
+        </div>
+        <div class="gauge-chip" id="ram-chip">
+          <span class="gauge-label">RAM</span>
+          <div class="mini-bar-track">
+            <div class="mini-bar-fill" id="ram-fill" style="width: 0%;"></div>
+          </div>
+          <span class="gauge-val" id="ram-val">--%</span>
+        </div>
+        <div class="gauge-chip" id="model-chip" title="현재 연결된 AI 모델">
+          <span class="status-dot active"></span>
+          <span class="gauge-val" id="active-model-name">Gemma 4 31B Free</span>
+        </div>
+        <div class="gauge-chip" id="uptime-chip">
+          <span class="gauge-label">UPTIME</span>
+          <span class="gauge-val" id="uptime-val">0h 0m</span>
+        </div>
+      </div>
+
+      <!-- Header Action Controls -->
+      <div class="header-controls">
+        <button id="btn-header-research" class="hud-btn-mini primary" title="심층 자료 조사 창 열기">
+          <span>🌐 자료 조사</span>
+        </button>
+        <button id="btn-header-apps" class="hud-btn-mini" title="전체 설치된 앱 보기 및 실행">
+          <span>📱 모든 앱 (126+)</span>
+        </button>
+        <button id="btn-settings" class="icon-btn" title="설정 (OpenRouter API 키 / 모델 설정)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="hud-body">
+      <!-- Left Hero Column: Arc Reactor Core & Voice Spectrum -->
+      <section class="core-section">
+        <!-- Hologram Arc Reactor Unit -->
+        <div class="reactor-wrapper" id="reactor-core-btn" title="클릭하여 음성 인식 토글">
+          <div class="ring outer-ring"></div>
+          <div class="ring middle-ring"></div>
+          <div class="ring inner-ring"></div>
+          <div class="reactor-center">
+            <div class="core-glow"></div>
+            <div class="core-pulse"></div>
+            <div class="core-symbol">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2" id="core-mic-icon">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+            </div>
+          </div>
+          <!-- Hexagonal HUD decor points -->
+          <div class="hud-crosshair top-ch"></div>
+          <div class="hud-crosshair bottom-ch"></div>
+          <div class="hud-crosshair left-ch"></div>
+          <div class="hud-crosshair right-ch"></div>
+        </div>
+
+        <!-- Real-time Voice Wave Canvas & Mic Monitor -->
+        <div class="visualizer-container">
+          <canvas id="audio-wave-canvas" width="460" height="54"></canvas>
+          <div class="mic-status-bar">
+            <span class="mic-indicator-dot" id="mic-indicator-dot"></span>
+            <span class="mic-status-label" id="mic-status-label">마이크: 대기 중 (실시간 음파 감지 활성화)</span>
+          </div>
+        </div>
+
+        <!-- Status & Live Transcript HUD Card -->
+        <div class="status-hud-card">
+          <div class="status-badge" id="jarvis-status-badge">
+            <span class="status-indicator"></span>
+            <span id="jarvis-status-text">SYSTEM READY (대기 중)</span>
+          </div>
+          <div class="transcript-display" id="transcript-display">
+            "자비스, 인공지능 자료 조사해줘" 또는 "스팀 켜줘", "카카오톡 열어줘"라고 말씀해 보세요.
+          </div>
+          <div class="voice-actions-toolbar">
+            <button id="toggle-voice-btn" class="hud-btn primary glow" title="마이크로 음성 명령 시작">
+              <span class="btn-icon">🎙️</span>
+              <span id="voice-btn-text">음성 듣기 시작</span>
+            </button>
+            <button id="btn-win-voice" class="hud-btn secondary win-voice" title="Windows 11 고성능 기본 음성 받아쓰기 활성화 (Win + H)">
+              <span class="btn-icon">⚡</span>
+              <span>Windows 음성 [Win+H]</span>
+            </button>
+            <button id="toggle-tts-btn" class="hud-btn secondary" title="자비스 음성 답변 켜기/끄기">
+              <span id="tts-icon">🔊</span>
+              <span id="tts-text">음성: ON</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Interactive Command Feed & Quick Controls -->
+      <section class="feed-section">
+        <!-- Quick PC Action Grid -->
+        <div class="quick-actions-bar">
+          <div class="quick-header-row">
+            <span class="quick-title">⚡ QUICK ACTIONS & APPS</span>
+            <span class="quick-sub">원클릭 실행 및 조사</span>
+          </div>
+          <div class="quick-grid">
+            <button class="quick-btn highlight" id="btn-quick-research">🌐 자료 조사</button>
+            <button class="quick-btn highlight" id="btn-quick-apps">📱 모든 앱 (126+)</button>
+            <button class="quick-btn" data-action="app" data-target="스팀">🎮 스팀</button>
+            <button class="quick-btn" data-action="app" data-target="디스코드">💬 디스코드</button>
+            <button class="quick-btn" data-action="app" data-target="카카오톡">🟡 카카오톡</button>
+            <button class="quick-btn" data-action="app" data-target="크롬">🌐 크롬</button>
+            <button class="quick-btn" data-action="app" data-target="유튜브">▶️ 유튜브</button>
+            <button class="quick-btn" data-action="app" data-target="계산기">🔢 계산기</button>
+            <button class="quick-btn" data-action="app" data-target="메모장">📝 메모장</button>
+            <button class="quick-btn" data-action="app" data-target="엑셀">📊 엑셀</button>
+            <button class="quick-btn" data-action="app" data-target="워드">📄 워드</button>
+            <button class="quick-btn" data-action="app" data-target="작업관리자">⚙️ 작업관리자</button>
+            <button class="quick-btn" data-action="volume" data-target="up">🔊 볼륨 ↑</button>
+            <button class="quick-btn" data-action="volume" data-target="down">🔉 볼륨 ↓</button>
+            <button class="quick-btn" data-action="system" data-target="minimize_all">🖥️ 바탕화면</button>
+            <button class="quick-btn" data-action="system" data-target="screenshot">📸 캡처</button>
+            <button class="quick-btn" data-action="system" data-target="lock">🔒 화면잠금</button>
+          </div>
+        </div>
+
+        <!-- Terminal Log / Message Stream -->
+        <div class="terminal-container">
+          <div class="terminal-header">
+            <span class="term-title"><span class="dot"></span> PROTOCOL EVENT STREAM</span>
+            <button id="btn-clear-log" class="text-link-btn">로그 지우기</button>
+          </div>
+          <div class="terminal-stream" id="chat-stream">
+            <!-- Initial Welcome Message -->
+            <div class="feed-item jarvis">
+              <div class="feed-badge">J.A.R.V.I.S. MARK 4.31B</div>
+              <div class="feed-content">
+                안녕하세요 보스, 자비스 온라인입니다. 시스템 진단 및 음성 인터페이스가 준비되었습니다.<br>
+                • <strong>자료 조사 (Research Engine)</strong>: "OO에 대해 조사해줘"라고 말씀하시면 위키백과 및 웹 지식을 심층 분석하여 인텔리전스 브리핑 보고서를 작성합니다.<br>
+                • <strong>거의 모든 앱 실행</strong>: PC에 설치된 126개 이상의 앱(스팀, 카톡, 디스코드, 엑셀, 게임, 브라우저 등)을 이름만 부르면 즉시 실행합니다.<br>
+                • <strong>음성인식</strong>: 상단 마이크 버튼 또는 <code>[Win + H]</code>를 누르면 즉시 고성능 한국어 음성 인식이 작동합니다.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Command Input Console -->
+        <div class="console-input-bar">
+          <div class="input-glow-wrapper">
+            <input type="text" id="command-input" placeholder="명령어 입력 (예: '인공지능 자료 조사해줘', '스팀 켜줘', '카카오톡 열어줘', '볼륨 줄여')..." autocomplete="off">
+            <button id="btn-send-command" class="send-btn" title="명령 전송">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Deep Research Dialog Modal -->
+    <div class="modal-overlay hidden" id="research-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 class="modal-title">🌐 J.A.R.V.I.S. 심층 자료 조사 연구소</h2>
+          <button class="modal-close-btn" id="research-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-intro">
+            원하시는 주제, 인물, 기술, 학술 개념을 입력하시면 실시간 백과사전 지식베이스와 Gemma 4 31B AI가 정밀 분석하여 종합 브리핑 보고서를 생성합니다.
+          </p>
+          <div class="form-group">
+            <label for="research-topic-input">조사할 주제 또는 질문</label>
+            <div class="input-with-action">
+              <input type="text" id="research-topic-input" class="cyber-input" placeholder="예: 양자 컴퓨터, 초전도체, 손흥민, 아이언맨 슈트 기술, 생성형 AI...">
+              <button id="btn-run-research" class="hud-btn primary glow">조사 시작</button>
+            </div>
+          </div>
+          <div class="suggested-topics">
+            <span class="suggest-label">추천 리서치 키워드:</span>
+            <div class="suggest-chips">
+              <button class="chip-btn" data-topic="인공지능 초거대 언어모델">인공지능 LLM</button>
+              <button class="chip-btn" data-topic="양자 컴퓨터">양자 컴퓨터</button>
+              <button class="chip-btn" data-topic="상온 초전도체">초전도체</button>
+              <button class="chip-btn" data-topic="블랙홀과 일반 상대성이론">블랙홀</button>
+              <button class="chip-btn" data-topic="아이언맨 슈트 역사">아이언맨 슈트</button>
+              <button class="chip-btn" data-topic="화성 탐사 우주선">화성 탐사</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Installed Windows Apps Drawer Modal -->
+    <div class="modal-overlay hidden" id="apps-modal">
+      <div class="modal-card large-modal">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <h2 class="modal-title">📱 설치된 Windows 앱 브라우저</h2>
+            <span class="apps-count-badge" id="apps-count-badge">126개 앱 감지됨</span>
+          </div>
+          <button class="modal-close-btn" id="apps-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="apps-filter-bar">
+            <div class="search-input-wrapper">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="apps-search-input" placeholder="설치된 앱 검색 (예: 스팀, 크롬, 디스코드, OBS, 엑셀, 마인크래프트)...">
+            </div>
+            <button id="btn-refresh-apps" class="hud-btn secondary sm" title="앱 목록 새로고침">🔄 새로고침</button>
+          </div>
+          <div class="apps-grid-container" id="apps-grid-container">
+            <!-- Dynamic app cards injected here -->
+            <div class="loading-apps">설치된 애플리케이션을 불러오는 중...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal Drawer -->
+    <div class="modal-overlay hidden" id="settings-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 class="modal-title">⚙️ J.A.R.V.I.S. 시스템 환경 설정</h2>
+          <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <!-- OpenRouter API Key Input -->
+          <div class="form-group">
+            <label for="input-api-key">OpenRouter API Key</label>
+            <div class="input-with-toggle">
+              <input type="password" id="input-api-key" placeholder="sk-or-v1-...">
+              <button type="button" id="toggle-key-visibility" class="btn-sm">표시</button>
+            </div>
+            <p class="form-help">
+              <a href="https://openrouter.ai/keys" target="_blank" class="cyber-link">OpenRouter.ai</a>에서 발급받은 무료 API 키를 입력하세요. 키가 없어도 기본 오프라인 PC 제어 명령과 로컬 백과사전 조사는 즉시 동작합니다.
+            </p>
+          </div>
+
+          <!-- Model Selection -->
+          <div class="form-group">
+            <label for="select-model">AI 엔진 모델 (OpenRouter)</label>
+            <select id="select-model" class="cyber-select">
+              <option value="google/gemma-4-31b-it:free" selected>google/gemma-4-31b-it:free (요청하신 Gemma 4 31B Free 모델)</option>
+              <option value="openrouter/free">openrouter/free (자동 최적 무료 모델 라우팅)</option>
+              <option value="google/gemma-2-27b-it:free">google/gemma-2-27b-it:free (Gemma 2 27B Free)</option>
+              <option value="meta-llama/llama-3.3-70b-instruct:free">meta-llama/llama-3.3-70b-instruct:free (Llama 3.3 70B Free)</option>
+            </select>
+          </div>
+
+          <!-- Voice / TTS Settings -->
+          <div class="form-group">
+            <label for="select-voice">자비스 한국어 음성 (TTS)</label>
+            <select id="select-voice" class="cyber-select">
+              <option value="">기본 시스템 한국어 음성</option>
+            </select>
+            <div class="voice-sliders">
+              <div class="slider-row">
+                <span>음높이 (Pitch):</span>
+                <input type="range" id="voice-pitch" min="0.5" max="1.5" step="0.1" value="0.9">
+                <span id="pitch-val">0.9</span>
+              </div>
+              <div class="slider-row">
+                <span>말하기 속도 (Rate):</span>
+                <input type="range" id="voice-rate" min="0.7" max="1.4" step="0.1" value="1.05">
+                <span id="rate-val">1.05</span>
+              </div>
+            </div>
+            <button type="button" id="btn-test-voice" class="hud-btn secondary sm">자비스 목소리 테스트</button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <span id="settings-save-status" class="save-status"></span>
+          <button id="btn-save-settings" class="hud-btn primary glow">설정 저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
