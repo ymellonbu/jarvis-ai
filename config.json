@@ -1,0 +1,9 @@
+{
+  "apiKey": "",
+  "model": "google/gemma-4-31b-it:free",
+  "voiceFeedback": true,
+  "continuousListening": false,
+  "wakeWordEnabled": true,
+  "voicePitch": 0.9,
+  "voiceRate": 1.05
+}
