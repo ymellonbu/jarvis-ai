@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, session } = require('electron');
+const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const systemController = require('./src/system-controller');
@@ -90,7 +91,7 @@ ipcMain.handle('save-settings', async (event, newSettings) => {
 
   try {
     fs.writeFileSync(LOCAL_CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8');
-    try { fs.writeFileSync(USER_CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8'); } catch (e) {}
+    try { fs.writeFileSync(USER_CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8'); } catch (e) { }
     return { success: true, config };
   } catch (e) {
     return { success: false, error: e.message };
@@ -208,6 +209,48 @@ ipcMain.handle('process-jarvis-command', async (event, text) => {
   }
 });
 
+let pythonServiceProcess = null;
+
+function startPythonService() {
+  const scriptPath = path.join(__dirname, 'src', 'service.py');
+  if (!fs.existsSync(scriptPath)) return;
+
+  try {
+    pythonServiceProcess = spawn('python', [scriptPath], {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      windowsHide: true
+    });
+
+    pythonServiceProcess.stdout.on('data', (data) => {
+      console.log(`[Python Service]: ${data.toString().trim()}`);
+    });
+
+    pythonServiceProcess.stderr.on('data', (data) => {
+      console.error(`[Python Service Error]: ${data.toString().trim()}`);
+    });
+
+    pythonServiceProcess.on('error', (err) => {
+      console.warn('[Python Service] Could not launch python:', err.message);
+    });
+
+    pythonServiceProcess.on('close', (code) => {
+      console.log(`[Python Service] Exited with code: ${code}`);
+      pythonServiceProcess = null;
+    });
+  } catch (err) {
+    console.error('Failed to spawn Python service:', err);
+  }
+}
+
+function stopPythonService() {
+  if (pythonServiceProcess) {
+    try {
+      pythonServiceProcess.kill();
+    } catch (e) {}
+    pythonServiceProcess = null;
+  }
+}
+
 app.whenReady().then(() => {
   // Grant microphone, audio capture, speech recognition, and media permissions
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
@@ -221,6 +264,9 @@ app.whenReady().then(() => {
     return true;
   });
 
+  // Start background Python service if present
+  startPythonService();
+
   createWindow();
 
   app.on('activate', () => {
@@ -230,8 +276,14 @@ app.whenReady().then(() => {
   });
 });
 
+app.on('will-quit', () => {
+  stopPythonService();
+});
+
 app.on('window-all-closed', () => {
+  stopPythonService();
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
+
