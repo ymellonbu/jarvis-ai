@@ -14,7 +14,7 @@ const LOCAL_CONFIG_PATH = path.join(__dirname, 'config.json');
 
 // Default config
 let config = {
-  apiKey: '',
+
   model: DEFAULT_MODEL,
   voiceFeedback: true,
   continuousListening: false,
